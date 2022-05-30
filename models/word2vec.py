@@ -25,8 +25,8 @@ class Word2Vec(object):
         self._model = gensim.models.KeyedVectors.load(path)
 
     def get_word_vectors(self, words):
-        words = [w for w in words if w in self._model.model]
-        return self._model.model[words]
+        words = [w for w in words if w in self._model]
+        return self._model[words]
 
 
 

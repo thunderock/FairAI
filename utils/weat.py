@@ -6,6 +6,7 @@
 import json
 import numpy as np
 
+
 def unit_vector(vec):
     """
     Returns unit vector
@@ -28,23 +29,47 @@ class WEAT(object):
         self.model = model
         self.json = json.load(open(words_json))
 
-    def score(self, X, Y, A, B):
+    @property
+    def scores(self):
+        scores = []
+        for _, (name, i) in enumerate(self.json.items()):
+            x_key = i['X_key']
+            y_key = i['Y_key']
+            a_key = i['A_key']
+            b_key = i['B_key']
+
+            score = self.__score_individual(i[x_key], i[y_key], i[a_key], i[b_key])
+            scores.append(score)
+        return scores
+
+    @staticmethod
+    def __balance_vectors(A, B):
+        diff = len(A) - len(B)
+        if diff > 0:
+            A = np.delete(A, np.random.choice(range(len(A)), diff), axis=0)
+        elif diff < 0:
+            B = np.delete(B, np.random.choice(range(len(B)), -diff), axis=0)
+        return A, B
+
+    def __score_individual(self, X, Y, A, B):
         """
         Compute WEAT score
         :param X: target word vectors
-        :param Y: attribute word vectors
+        :param Y: target word vectors
         :param A: attribute word vectors
         :param B: attribute word vectors
         :return: WEAT score
         """
-        assert len(X) == len(Y) == len(A) == len(B)
-        assert len(X) > 0
 
         X = self.model.get_word_vectors(X)
         Y = self.model.get_word_vectors(Y)
         A = self.model.get_word_vectors(A)
         B = self.model.get_word_vectors(B)
-        assert len(X) == len(Y) == len(A) == len(B)
+
+        X, Y = WEAT.__balance_vectors(X, Y)
+        A, B = WEAT.__balance_vectors(A, B)
+
+        # assert len(X) == len(Y) == len(A) == len(B), "{} != {} != {} != {}".format(len(X), len(Y), len(A), len(B))
 
         return self.__score_vectors(X, Y, A, B)
 
