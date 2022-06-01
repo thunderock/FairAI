@@ -25,8 +25,8 @@ from utils.weat import WEAT
 # model.save("../word2vec.model")
 
 
-model = Word2Vec()
-model.load("../word2vec.model")
+model = Word2Vec(load=True, path='../word2vec.model')
+
 
 weat = WEAT(model, 'weat/weat.json')
 

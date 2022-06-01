@@ -8,13 +8,15 @@ import gensim
 
 class Word2Vec(object):
 
-    def __init__(self, lines=None):
+    def __init__(self, lines=None, load=False, path=None):
         self.lines = lines
         self._model = None
+        if load:
+            self.load(path)
 
     def fit(self, window_size=10, min_count=5, workers=4, dim=100):
         self._model = gensim.models.Word2Vec(self.lines, window=window_size, min_count=min_count,
-                                                workers=workers, vector_size=dim).wv
+                                             workers=workers, vector_size=dim).wv
         return self._model
 
     def save(self, path):
