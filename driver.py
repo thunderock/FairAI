@@ -7,8 +7,8 @@
 from models.word2vec import Word2Vec
 from nltk import word_tokenize
 from tqdm import tqdm
-from gensim.corpora.wikicorpus import WikiCorpus
 from utils.weat import WEAT
+from utils.dataset import Dataset
 # ! wget -P /tmp/ http://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2
 # ! wget -P /tmp/ https://dumps.wikimedia.org/swwiki/latest/swwiki-latest-pages-articles.xml.bz2
 
@@ -19,9 +19,10 @@ from utils.weat import WEAT
 
 # train the model
 # file = '/tmp/swwiki-latest-pages-articles.xml.bz2'
-# sents = list(WikiCorpus(file).get_texts())
-# model = Word2Vec(sents)
-# model.fit()
+# dataset = object
+# ds = Dataset(file)
+# model = Word2Vec(load=False)
+# model.fit(ds, workers=6)
 # model.save("../word2vec.model")
 
 

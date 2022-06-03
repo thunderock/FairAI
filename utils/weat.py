@@ -61,10 +61,10 @@ class WEAT(object):
         :return: WEAT score
         """
 
-        X = self.model.get_word_vectors(X)
-        Y = self.model.get_word_vectors(Y)
-        A = self.model.get_word_vectors(A)
-        B = self.model.get_word_vectors(B)
+        X = self.model.transform(X)
+        Y = self.model.transform(Y)
+        A = self.model.transform(A)
+        B = self.model.transform(B)
 
         X, Y = WEAT.__balance_vectors(X, Y)
         A, B = WEAT.__balance_vectors(A, B)
