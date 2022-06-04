@@ -4,11 +4,13 @@
 # @Time:        5/28/22 12:01 AM
 
 import gensim
+from model import Model
 
 
-class Word2Vec(object):
+class Word2Vec(Model):
 
     def __init__(self, load=False, window_size=10, min_count=5, dim=100,path=None):
+        super().__init__(dim, load, window_size, min_count, path)
         self.window_size = window_size
         self.min_count = min_count
         self.dim = dim
