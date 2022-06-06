@@ -4,7 +4,7 @@
 # @Time:        5/28/22 12:01 AM
 
 import gensim
-from model import Model
+from models.model import Model
 
 
 class Word2Vec(Model):

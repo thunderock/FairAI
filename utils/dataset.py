@@ -12,4 +12,4 @@ class Dataset(object):
 
     @property
     def lines(self):
-        return list(WikiCorpus(self.path).get_texts())
+        return list(WikiCorpus(self.path).getstream())

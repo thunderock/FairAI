@@ -18,21 +18,21 @@ from utils.dataset import Dataset
 # sents = [word_tokenize(line.lower()) for line in tqdm(lines)]
 
 # train the model
-# file = '/tmp/swwiki-latest-pages-articles.xml.bz2'
-# dataset = object
-# ds = Dataset(file)
-# model = Word2Vec(load=False)
-# model.fit(ds, workers=6)
-# model.save("../word2vec.model")
+file = '/tmp/swwiki-latest-pages-articles.xml.bz2'
+dataset = object
+ds = Dataset(file)
+model = Word2Vec(load=False)
+model.fit(ds, workers=6)
+model.save("../word2vec.model")
 
 
-model = Word2Vec(load=True, path='../word2vec.model')
-
-
-weat = WEAT(model, 'weat/weat.json')
-
-weat_scores = weat.scores
-print(weat_scores)
+# model = Word2Vec(load=True, path='../word2vec.model')
+#
+#
+# weat = WEAT(model, 'weat/weat.json')
+#
+# weat_scores = weat.scores
+# print(weat_scores)
 
 
 
