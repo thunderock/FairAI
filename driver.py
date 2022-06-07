@@ -34,7 +34,7 @@ from utils.jackknife import JackKnife
 #
 # weat_scores = weat.get_scores()
 # print(weat_scores)
-ds = Dataset('../enwiki-latest-pages-articles.xml.bz2')
+ds = Dataset('../swwiki-latest-pages-articles.xml.bz2')
 jk = JackKnife(ds)
 scores = jk.weat_scores()
 

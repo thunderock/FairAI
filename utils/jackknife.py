@@ -15,10 +15,11 @@ class JackKnife(object):
 
     def weat_scores(self):
         scores = np.empty((self.dataset.size, 7))
-        for i in trange(self.dataset.size):
+        size = self.dataset.size
+        for i in trange(size):
             lines = self.dataset.lines[:i] + self.dataset.lines[i + 1:]
             model = Word2Vec(load=False)
-            model.fit(dataset.TextCorpus(lines), workers=20)
+            model.fit(dataset.TextCorpus(lines), workers=25)
             scorer = weat.WEAT(model)
             scores[i, :] = scorer.get_scores()
         return scores
