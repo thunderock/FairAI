@@ -25,12 +25,11 @@ def cos_sim(v1, v2):
 
 class WEAT(object):
 
-    def __init__(self, model, words_json):
+    def __init__(self, model, words_json='weat/weat.json'):
         self.model = model
         self.json = json.load(open(words_json))
 
-    @property
-    def scores(self):
+    def get_scores(self):
         scores = []
         for _, (name, i) in enumerate(self.json.items()):
             x_key = i['X_key']

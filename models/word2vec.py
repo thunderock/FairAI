@@ -19,8 +19,11 @@ class Word2Vec(Model):
             self.load(path)
 
     def fit(self, dataset, workers=4):
-        self._model = gensim.models.Word2Vec(dataset.lines, window=self.window_size, min_count=self.min_count,
-                                             workers=workers, vector_size=self.dim).wv
+        model = gensim.models.Word2Vec(window=self.window_size, min_count=self.min_count,
+                                             workers=workers, vector_size=self.dim)
+        model.build_vocab(dataset.lines)
+        model.train(dataset.lines, total_examples=dataset.size, epochs=10)
+        self._model = model.wv
         return self._model
 
     def save(self, path):
