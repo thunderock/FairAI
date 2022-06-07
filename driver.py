@@ -10,6 +10,7 @@ from tqdm import tqdm
 from utils.weat import WEAT
 from utils.dataset import Dataset
 from utils.jackknife import JackKnife
+import numpy as np
 # ! wget -P /tmp/ http://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2
 # ! wget -P /tmp/ https://dumps.wikimedia.org/swwiki/latest/swwiki-latest-pages-articles.xml.bz2
 
@@ -34,11 +35,10 @@ from utils.jackknife import JackKnife
 #
 # weat_scores = weat.get_scores()
 # print(weat_scores)
-ds = Dataset('../swwiki-latest-pages-articles.xml.bz2')
+ds = Dataset('/tmp/swwiki-latest-pages-articles.xml.bz2')
+# print(ds.lines)
 jk = JackKnife(ds)
 scores = jk.weat_scores()
-
-import numpy as np
 
 np.save('scores.npy', scores)
 
