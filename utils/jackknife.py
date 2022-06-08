@@ -16,6 +16,7 @@ class JackKnife(object):
 
     @staticmethod
     def score_dataset_id(id, instances):
+        print(id)
         lines = instances[:id] + instances[id + 1:]
         model = Word2Vec(load=False)
         model.fit(dataset.TextCorpus(lines), workers=1)
@@ -25,9 +26,9 @@ class JackKnife(object):
     def weat_scores(self):
         size = self.dataset.size
         import multiprocessing as mp
-        pool = mp.Pool(processes=20)
+        pool = mp.Pool(processes=25)
         score_func = partial(JackKnife.score_dataset_id, instances=self.dataset.lines)
-        result = pool.map(score_func, trange(size))
+        result = list(tqdm(pool.imap(score_func, range(size))))
         pool.close()
         pool.join()
-        return result
+        return np.array(result)

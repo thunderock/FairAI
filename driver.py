@@ -5,7 +5,6 @@
 
 
 from models.word2vec import Word2Vec
-from nltk import word_tokenize
 from tqdm import tqdm
 from utils.weat import WEAT
 from utils.dataset import Dataset
