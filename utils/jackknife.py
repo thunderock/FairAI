@@ -8,6 +8,8 @@ from utils import dataset, weat
 from tqdm import tqdm, trange
 from models.word2vec import Word2Vec
 from functools import partial
+import multiprocessing as mp
+
 
 class JackKnife(object):
     def __init__(self, dataset):
@@ -15,9 +17,9 @@ class JackKnife(object):
         assert self.dataset.stream is False, 'Streaming data not supported in JackKnife yet'
 
     @staticmethod
-    def score_dataset_id(id, instances):
-        print(id)
-        lines = instances[:id] + instances[id + 1:]
+    def score_dataset_id(iid, instances):
+        print(iid)
+        lines = instances[:iid] + instances[iid + 1:]
         model = Word2Vec(load=False)
         model.fit(dataset.TextCorpus(lines), workers=1)
         scorer = weat.WEAT(model)
@@ -25,7 +27,6 @@ class JackKnife(object):
 
     def weat_scores(self):
         size = self.dataset.size
-        import multiprocessing as mp
         pool = mp.Pool(processes=25)
         score_func = partial(JackKnife.score_dataset_id, instances=self.dataset.lines)
         result = list(tqdm(pool.imap(score_func, range(size))))
