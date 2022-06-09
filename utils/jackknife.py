@@ -27,9 +27,11 @@ class JackKnife(object):
 
     def weat_scores(self):
         size = self.dataset.size
+        # size = 5
         pool = mp.Pool(processes=25)
-        score_func = partial(JackKnife.score_dataset_id, instances=self.dataset.lines)
-        result = list(tqdm(pool.imap(score_func, range(size))))
+        # score_func = partial(JackKnife.score_dataset_id, instances=self.dataset.lines)
+
+        result = pool.starmap(JackKnife.score_dataset_id, tqdm([(i, self.dataset.lines) for i in range(size)], total=size))
         pool.close()
         pool.join()
         return np.array(result)
