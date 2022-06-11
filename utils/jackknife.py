@@ -26,12 +26,20 @@ class JackKnife(object):
         return scorer.get_scores()
 
     def weat_scores(self):
-        size = self.dataset.size
-        # size = 5
-        pool = mp.Pool(processes=25)
+        total = 100
+        threads = pool_size = 100
         # score_func = partial(JackKnife.score_dataset_id, instances=self.dataset.lines)
-
-        result = pool.starmap(JackKnife.score_dataset_id, tqdm([(i, self.dataset.lines) for i in range(size)], total=size))
-        pool.close()
-        pool.join()
-        return np.array(result)
+        final_result = np.zeros((total, 7))
+        st = 0
+        for i in trange(total // pool_size):
+            st = pool_size * i
+            pool = mp.Pool(processes=threads)
+            result = pool.starmap(JackKnife.score_dataset_id, [(st + j, self.dataset.lines) for j in range(pool_size)])
+            pool.close()
+            pool.join()
+            final_result[st: st + pool_size, :] = np.array(result)
+        st += pool_size
+        for i in trange(st, total):
+            final_result[i, :] = np.array(JackKnife.score_dataset_id(i, self.dataset.lines))
+        # print(final_result, st)
+        return final_result
