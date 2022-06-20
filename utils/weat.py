@@ -43,6 +43,7 @@ class WEAT(object):
 
     @staticmethod
     def __balance_vectors(A, B):
+        np.random.seed(2022)
         diff = len(A) - len(B)
         if diff > 0:
             A = np.delete(A, np.random.choice(range(len(A)), diff), axis=0)

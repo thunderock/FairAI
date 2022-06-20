@@ -5,6 +5,7 @@
 
 from gensim.corpora.wikicorpus import WikiCorpus
 
+
 class Dataset(object):
     def __init__(self, path, stream=False):
         self.path = path

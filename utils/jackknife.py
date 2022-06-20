@@ -7,7 +7,6 @@ import numpy as np
 from utils import dataset, weat
 from tqdm import tqdm, trange
 from models.word2vec import Word2Vec
-from functools import partial
 import multiprocessing as mp
 
 
@@ -26,8 +25,8 @@ class JackKnife(object):
         return scorer.get_scores()
 
     def weat_scores(self):
-        total = 100
-        threads = pool_size = 100
+        total = self.dataset.size
+        threads = pool_size = 90
         # score_func = partial(JackKnife.score_dataset_id, instances=self.dataset.lines)
         final_result = np.zeros((total, 7))
         st = 0

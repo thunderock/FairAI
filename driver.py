@@ -34,7 +34,7 @@ import numpy as np
 #
 # weat_scores = weat.get_scores()
 # print(weat_scores)
-ds = Dataset('../swwiki-latest-pages-articles.xml.bz2')
+ds = Dataset('../simplewiki-20171103-pages-articles-multistream.xml.bz2')
 # print(ds.lines)
 jk = JackKnife(ds)
 scores = jk.weat_scores()
