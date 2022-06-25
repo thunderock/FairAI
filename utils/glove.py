@@ -76,8 +76,7 @@ class Glove(object):
         file.close()
         return scipy.sparse.csc_matrix((X, (I, J)), shape=(vocab_size, vocab_size))
 
-    def parse_coocs(self, text, vocab, window_size):
-        words = text.split()
+    def parse_coocs(self, words, vocab, window_size):
         i, j, l1, l2 = -2, -2, 0, -1
         net_offset = 0
         I, J, vals = [], [], []
@@ -127,16 +126,23 @@ class Glove(object):
             return np.float64(1.)
         return np.float64((x / mx) ** alpha)
 
-    def compute_IF_deltas(self, document: str, M:GloveWrapper, X:scipy.sparse.csc_matrix):
+    def x_bar(self, X, Y):
+        # TODO(ashutiwa): make this more efficient here https://seanlaw.github.io/2019/02/27/set-values-in-sparse-matrix/
+        X_bar = X - Y
+        X_bar[X_bar < 0] = 0
+        X_bar.eliminate_zeros()
+        return X_bar
+
+    def compute_IF_deltas(self, document: str, M: GloveWrapper, X: scipy.sparse.csc_matrix, weat_words: set):
         Y = self.doc2cooc(document, M.vocab, M.d)
-        affected_inds = np.unique(Y.nonzero()[0])
-        N = len(affected_inds)
+        # affected_inds = np.unique(Y.nonzero()[0])
+        # N = len(affected_inds)
         deltas = {}
+        common_words = weat_words.intersection(set(document))
+        affected_inds = [M.vocab[word][0] for word in common_words]
+        N = len(affected_inds)
         if N != 0:
-            # TODO(ashutiwa): make this more efficient here https://seanlaw.github.io/2019/02/27/set-values-in-sparse-matrix/
-            X_bar = X - Y
-            X_bar[X_bar < 0] = 0
-            X_bar.eliminate_zeros()
+            X_bar = self.x_bar(X, Y)
             for idx in affected_inds:
                 gi = self.del_LI(M.W, M.b_w, M.U, M.b_u, X, idx)
                 Hi = self.del_sq_LI(M.U, X_bar, idx)
