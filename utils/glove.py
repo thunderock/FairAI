@@ -10,21 +10,14 @@ import struct
 INT_INF = np.iinfo(np.int32).max
 INT_MIN = np.iinfo(np.int32).min
 
-from models.model import Model
-
 class GloveWrapper(object):
     def __init__(self):
         self.vocab, self.ivocab, self.W, self.b_w, self.U, self.b_u, self.D, self.d, self.vocab_path, self.embedding_path = [None] * 10
+        
 
-
-class Glove(Model):
+class Glove(object):
     def __init__(self):
         pass
-    #
-    # def non_zero_values_and_indices(self, X:scipy.sparse.csc_matrix, row_index:int=INT_INF, col_index:int=INT_INF) -> (np.array, np.array):
-    #     values = X[row_index if row_index != INT_INF else , col_index].nonzero()[0]
-
-
 
     def load_bin_vectors(self, embedding_path, vocab_size):
         n = os.path.getsize(embedding_path) // 8
@@ -68,7 +61,6 @@ class Glove(Model):
     def read_cooc(self, line):
         entry = line.split()
         return (np.int32(entry[0]), np.int32(entry[1]), np.float64(entry[2]))
-
 
     def load_cooc(self, cooc_path, vocab_size):
         I, J, X = [], [], []
@@ -166,30 +158,15 @@ class Glove(Model):
             G[idx] = self.del_LI(M.W, M.b_w, M.U, M.b_u, X, idx)
         return G
 
-    def compute_IF_deltas_for(self, document, M:GloveWrapper, X:scipy.sparse.csc_matrix, target_indices:np.array, H:dict, G:dict):
-        num_words = len(target_indices)
-        deltas = {}
-        if num_words != 0:
-# "Model loading"
-# In [1]: from models import glove
-#
-# In [2]: g = glove.Glove()
-#
-# In [3]: m = g.load_model('embeddings')
-#
-# In [4]: m[7]
-# Out[4]: 8
-#
-# In [5]: m[6]
-# Out[5]: 25
-#
-# In [6]: m[1][3]
-# Out[6]: 'in'
-#
-# In [7]: m[1][2]
-# Out[7]: 'and'
-#
-# In [8]: m[0]["is"]
-# Out[8]: (5, 213234)
+    def get_new_W(self, M:GloveWrapper, deltas:dict):
+        num_words = len(deltas)
+        W = M.W.copy()
+        for idx in deltas:
+            W[idx, :] -= deltas[idx]
+        return W
+
+
+
+
 
 

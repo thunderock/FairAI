@@ -34,10 +34,11 @@ import numpy as np
 #
 # weat_scores = weat.get_scores()
 # print(weat_scores)
+model = Word2Vec
 ds = Dataset('../simplewiki-20171103-pages-articles-multistream.xml.bz2')
 # print(ds.lines)
 jk = JackKnife(ds)
-scores = jk.weat_scores()
+scores = jk.weat_scores(model)
 
 np.save('scores.npy', scores)
 
