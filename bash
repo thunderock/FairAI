@@ -7,4 +7,4 @@
 #SBATCH --partition=general
 
 
-srun python driver.py
+srun python driver_torch.py
