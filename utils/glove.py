@@ -139,7 +139,7 @@ class Glove(object):
         # N = len(affected_inds)
         deltas = {}
         common_words = weat_words.intersection(set(document))
-        affected_inds = [M.vocab[word][0] for word in common_words]
+        affected_inds = [M.vocab[word][0] for word in common_words if word in M.vocab]
         N = len(affected_inds)
         if N != 0:
             X_bar = self.x_bar(X, Y)
