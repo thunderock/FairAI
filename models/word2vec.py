@@ -24,8 +24,8 @@ class Word2Vec(Model):
         lines = dataset[:iid] + dataset[iid + 1:]
         model.build_vocab(lines)
         model.train(dataset, total_examples=len(dataset), epochs=10)
-        self._model = model.wv
-        return self._model
+        return model.wv
+        # return self._model
 
     def save(self, path):
         assert self._model is not None, 'Model not fitted yet'
@@ -34,9 +34,9 @@ class Word2Vec(Model):
     def load(self, path):
         self._model = gensim.models.KeyedVectors.load(path)
 
-    def transform(self, words):
-        words = [w for w in words if w in self._model]
-        return self._model[words]
+    def transform(self, words, WV):
+        words = [w for w in words if w in WV]
+        return WV[words]
 
 
 

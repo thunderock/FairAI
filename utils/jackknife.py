@@ -19,13 +19,14 @@ class JackKnife(object):
     def score_dataset_id(iid, instances, model_module):
         # print(iid)
         model = model_module()
-        model.fit(dataset=instances, workers=1, iid=iid)
-        scorer = weat.WEAT(model)
+        W = model.fit(dataset=instances, workers=1, iid=iid)
+        scorer = weat.WEAT(model, W)
         return scorer.get_scores()
 
     def weat_scores(self, model_module=Word2Vec):
         total = self.dataset.size
-        threads = pool_size = 90
+        total = 3
+        threads = pool_size = 2
         # score_func = partial(JackKnife.score_dataset_id, instances=self.dataset.lines)
         final_result = np.zeros((total, 7))
         st = 0

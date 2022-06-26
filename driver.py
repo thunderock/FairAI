@@ -36,7 +36,7 @@ from models.fast_glove import FastGlove
 # weat_scores = weat.get_scores()
 # print(weat_scores)
 model = Word2Vec
-model = FastGlove
+# model = FastGlove
 ds = Dataset('../simplewiki-20171103-pages-articles-multistream.xml.bz2')
 # print(ds.lines)
 jk = JackKnife(ds)
