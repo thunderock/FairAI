@@ -1,16 +1,16 @@
-# @Filename:    driver.py
+# @Filename:    driver_torch.py
 # @Author:      Ashutosh Tiwari
 # @Email:       checkashu@gmail.com
-# @Time:        5/28/22 10:19 PM
+# @Time:        5/28/25 10:19 PM
 
 
+import numpy as np
 from models.word2vec import Word2Vec
 from tqdm import tqdm
-from utils.weat import WEAT
 from utils.dataset import Dataset
-from utils.jackknife import JackKnife
-import numpy as np
+from utils.jackknife_torch import JackKnifeTorch
 from models.fast_glove import FastGlove
+from torch.utils.data import DataLoader
 # ! wget -P /tmp/ http://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2
 # ! wget -P /tmp/ https://dumps.wikimedia.org/swwiki/latest/swwiki-latest-pages-articles.xml.bz2
 
@@ -39,8 +39,24 @@ model = Word2Vec
 model = FastGlove
 ds = Dataset('../simplewiki-20171103-pages-articles-multistream.xml.bz2')
 # print(ds.lines)
-jk = JackKnife(ds)
-scores = jk.weat_scores(model)
+jk = JackKnifeTorch(ds, model)
+total = len(jk)
+total = ds.size
+threads = 60
+loops = total // threads + 1
+loader = DataLoader(jk, batch_size=threads, shuffle=False)
+scores = np.zeros((total, 7))
+print(loops)
+status_loop = tqdm(loader, total=loops)
+
+for i, scores_ in enumerate(status_loop):
+    indices = scores_[1]
+    for ix, idx in enumerate(indices):
+        if idx < total:
+            scores[idx, :] = scores_[0][ix]
+    if i == loops:
+        break
+    status_loop.set_description('Processing batch %d' % i)
 
 np.save('scores.npy', scores)
 
