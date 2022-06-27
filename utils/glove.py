@@ -167,8 +167,9 @@ class Glove(object):
     def get_new_W(self, M:GloveWrapper, deltas:dict):
         num_words = len(deltas)
         W = M.W.copy()
+        V = len(M.vocab)
         for idx in deltas:
-            W[idx, :] -= deltas[idx]
+            W[idx, :] -= (1 / V) * deltas[idx]
         return W
 
 
