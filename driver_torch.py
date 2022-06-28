@@ -3,7 +3,7 @@
 # @Email:       checkashu@gmail.com
 # @Time:        5/28/25 10:19 PM
 
-
+import gc
 import numpy as np
 from models.word2vec import Word2Vec
 from tqdm import tqdm
@@ -42,7 +42,7 @@ ds = Dataset('../simplewiki-20171103-pages-articles-multistream.xml.bz2')
 jk = JackKnifeTorch(ds, model)
 total = len(jk)
 total = ds.size
-threads = 50
+threads = 55
 loops = total // threads + 1
 loader = DataLoader(jk, batch_size=threads, shuffle=False)
 scores = np.zeros((total, 7))
@@ -56,10 +56,13 @@ for i, scores_ in enumerate(status_loop):
             scores[idx, :] = scores_[0][ix]
     if i == loops:
         break
-    np.save('vectors/scores.npy', scores)
+    if i % 100:
+        np.save('scores.npy', scores)
+    del indices
+    gc.collect()
     status_loop.set_description('Processing batch %d' % i)
 
-np.save('vectors/scores.npy', scores)
+np.save('scores.npy', scores)
 
 
 

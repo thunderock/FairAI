@@ -8,6 +8,7 @@ from utils import glove
 from models.model import Model
 import pickle as pkl
 
+
 class FastGlove(Model):
     def __init__(self, embedding_dir="embeddings"):
         # dim fixed comes from trained model
