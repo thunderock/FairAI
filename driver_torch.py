@@ -42,7 +42,7 @@ ds = Dataset('../simplewiki-20171103-pages-articles-multistream.xml.bz2')
 jk = JackKnifeTorch(ds, model)
 total = len(jk)
 total = ds.size
-threads = 60
+threads = 50
 loops = total // threads + 1
 loader = DataLoader(jk, batch_size=threads, shuffle=False)
 scores = np.zeros((total, 7))
@@ -56,9 +56,10 @@ for i, scores_ in enumerate(status_loop):
             scores[idx, :] = scores_[0][ix]
     if i == loops:
         break
+    np.save('vectors/scores.npy', scores)
     status_loop.set_description('Processing batch %d' % i)
 
-np.save('scores.npy', scores)
+np.save('vectors/scores.npy', scores)
 
 
 
