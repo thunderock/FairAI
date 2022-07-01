@@ -21,5 +21,5 @@ class Model(object):
     def load(self, path):
         assert False, 'Not implemented'
 
-    def transform(self, words):
+    def transform(self, words, WV):
         assert False, 'Not implemented'

@@ -30,7 +30,9 @@ class FastGlove(Model):
         deltas = self.g.compute_IF_deltas(document, self.M, self.X, self.weat_words)
         return self.g.get_new_W(self.M, deltas)
 
-    def transform(self, words, W):
+    def transform(self, words, W=None):
+        if W is None:
+            W = self.M.W
         indices = [self.M.vocab[w][0] for w in words if w in self.M.vocab]
         ret = np.empty((len(indices), self.M.D))
         for i, idx in enumerate(indices):
