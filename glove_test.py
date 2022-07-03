@@ -5,7 +5,7 @@
 
 from utils import glove
 
-cooc_path = "embeddings/cooc-C0-V20-W8.bin"
+cooc_path = "embeddings/cooc-C0-V10-W8.bin"
 embedding_dir = "embeddings"
 document = "the quick brown fox jumped over the lazy dog" # add test WEAT words here and then take intersection of document and WEAT words
 

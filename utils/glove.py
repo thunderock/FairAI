@@ -38,8 +38,8 @@ class Glove(object):
         return W, b_w, U, b_u
 
     def load_model(self, embedding_dir, window_size=8):
-        vocab_path = os.path.join(embedding_dir, 'vocab-C0-V20.txt')
-        embedding_path = os.path.join(embedding_dir, 'vectors-C0-V20-W8-D25-R0.05-E15-S1.bin')
+        vocab_path = os.path.join(embedding_dir, 'vocab-C0-V10.txt')
+        embedding_path = os.path.join(embedding_dir, 'vectors-C0-V10-W8-D100-R0.05-E50-S1.bin')
         vocab, ivocab = self.load_vocab(vocab_path)
         d = window_size
         V = len(vocab)
