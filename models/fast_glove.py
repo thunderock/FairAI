@@ -13,7 +13,7 @@ class FastGlove(Model):
     def __init__(self, embedding_dir="embeddings"):
         # dim fixed comes from trained model
         # need to fix this, written specifically for word2vec
-        super().__init__(dim=100, load=True, window_size=8, min_count=None, path=embedding_dir)
+        super().__init__(dim=100, load=True, window_size=8, min_count=10, path=embedding_dir)
 
     def load(self, path):
         self.g = glove.Glove()
