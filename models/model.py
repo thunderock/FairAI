@@ -12,7 +12,7 @@ class Model(object):
         if load:
             self.load(path)
 
-    def fit(self, dataset, workers=4):
+    def fit(self, iid, dataset, workers=4):
         assert False, 'Not implemented'
 
     def save(self, path):
@@ -21,5 +21,5 @@ class Model(object):
     def load(self, path):
         assert False, 'Not implemented'
 
-    def transform(self, words):
+    def transform(self, words, WV):
         assert False, 'Not implemented'

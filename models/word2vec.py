@@ -18,12 +18,16 @@ class Word2Vec(Model):
         if load:
             self.load(path)
 
-    def fit(self, dataset, workers=4):
+    def fit(self, iid, dataset, workers=1):
         model = gensim.models.Word2Vec(window=self.window_size, min_count=self.min_count,
                                              workers=workers, vector_size=self.dim)
-        model.build_vocab(dataset.lines)
-        model.train(dataset.lines, total_examples=dataset.size, epochs=10)
-        self._model = model.wv
+        if iid is None:
+            lines = dataset
+        else:
+            lines = dataset[:iid] + dataset[iid + 1:]
+        model.build_vocab(lines)
+        model.train(dataset, total_examples=len(dataset), epochs=10)
+        self._model = model
         return self._model
 
     def save(self, path):
@@ -31,11 +35,13 @@ class Word2Vec(Model):
         self._model.save(path)
 
     def load(self, path):
-        self._model = gensim.models.KeyedVectors.load(path)
+        self._model = gensim.models.Word2Vec.load(path)
 
-    def transform(self, words):
-        words = [w for w in words if w in self._model]
-        return self._model[words]
+    def transform(self, words, WV=None):
+        if WV is None:
+            WV = self._model.wv
+        words = [w for w in words if w in WV]
+        return WV[words]
 
 
 

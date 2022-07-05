@@ -25,9 +25,10 @@ def cos_sim(v1, v2):
 
 class WEAT(object):
 
-    def __init__(self, model, words_json='weat/weat.json'):
+    def __init__(self, model, W, words_json='weat/weat.json'):
         self.model = model
         self.json = json.load(open(words_json))
+        self.W = W
 
     def get_scores(self):
         scores = []
@@ -61,10 +62,10 @@ class WEAT(object):
         :return: WEAT score
         """
 
-        X = self.model.transform(X)
-        Y = self.model.transform(Y)
-        A = self.model.transform(A)
-        B = self.model.transform(B)
+        X = self.model.transform(X, self.W)
+        Y = self.model.transform(Y, self.W)
+        A = self.model.transform(A, self.W)
+        B = self.model.transform(B, self.W)
 
         X, Y = WEAT.__balance_vectors(X, Y)
         A, B = WEAT.__balance_vectors(A, B)

@@ -16,29 +16,29 @@ class JackKnife(object):
         assert self.dataset.stream is False, 'Streaming data not supported in JackKnife yet'
 
     @staticmethod
-    def score_dataset_id(iid, instances):
-        print(iid)
-        lines = instances[:iid] + instances[iid + 1:]
-        model = Word2Vec(load=False)
-        model.fit(dataset.TextCorpus(lines), workers=1)
-        scorer = weat.WEAT(model)
+    def score_dataset_id(iid, instances, model_module):
+        # print(iid)
+        model = model_module()
+        W = model.fit(dataset=instances, workers=1, iid=iid)
+        scorer = weat.WEAT(model, W)
         return scorer.get_scores()
 
-    def weat_scores(self):
+    def weat_scores(self, model_module=Word2Vec):
         total = self.dataset.size
-        threads = pool_size = 90
+        total = 3
+        threads = pool_size = 2
         # score_func = partial(JackKnife.score_dataset_id, instances=self.dataset.lines)
         final_result = np.zeros((total, 7))
         st = 0
         for i in trange(total // pool_size):
             st = pool_size * i
             pool = mp.Pool(processes=threads)
-            result = pool.starmap(JackKnife.score_dataset_id, [(st + j, self.dataset.lines) for j in range(pool_size)])
+            result = pool.starmap(JackKnife.score_dataset_id, [(st + j, self.dataset.lines, model_module) for j in range(pool_size)])
             pool.close()
             pool.join()
             final_result[st: st + pool_size, :] = np.array(result)
         st += pool_size
         for i in trange(st, total):
-            final_result[i, :] = np.array(JackKnife.score_dataset_id(i, self.dataset.lines))
+            final_result[i, :] = np.array(JackKnife.score_dataset_id(i, self.dataset.lines, model_module))
         # print(final_result, st)
         return final_result
