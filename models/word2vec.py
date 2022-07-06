@@ -5,16 +5,17 @@
 
 import gensim
 from models.model import Model
-
+import pickle as pkl
 
 class Word2Vec(Model):
 
-    def __init__(self, load=False, window_size=10, min_count=5, dim=100,path=None):
+    def __init__(self, load=False, window_size=10, min_count=5, dim=100, path=None):
         super().__init__(dim, load, window_size, min_count, path)
         self.window_size = window_size
         self.min_count = min_count
         self.dim = dim
         self._model = None
+        self.in_vecs = None
         if load:
             self.load(path)
 
@@ -35,11 +36,19 @@ class Word2Vec(Model):
         self._model.save(path)
 
     def load(self, path):
-        self._model = gensim.models.Word2Vec.load(path)
+        try:
+            self._model = gensim.models.Word2Vec.load(path)
+        except (pkl.UnpicklingError, AttributeError) as e:
+            print("There was an error loading the model. Trying to load kv file instead!")
+            self.in_vecs = True
+            self._model = gensim.models.KeyedVectors.load(path)
 
     def transform(self, words, WV=None):
         if WV is None:
-            WV = self._model.wv
+            if self.in_vecs:
+                WV = self._model
+            else:
+                WV = self._model.wv
         words = [w for w in words if w in WV]
         return WV[words]
 

@@ -25,7 +25,7 @@ def cos_sim(v1, v2):
 
 class WEAT(object):
 
-    def __init__(self, model, W, words_json='weat/weat.json'):
+    def __init__(self, model, W=None, words_json='weat/weat.json'):
         self.model = model
         self.json = json.load(open(words_json))
         self.W = W
