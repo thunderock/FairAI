@@ -21,9 +21,3 @@ class Dataset(object):
     @property
     def size(self):
         return len(self.lines)
-
-
-class TextCorpus(Dataset):
-    def __init__(self, lines):
-        super().__init__(path=None, stream=False)
-        self.lines = lines

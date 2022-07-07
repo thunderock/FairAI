@@ -13,7 +13,7 @@ class JackKnifeTorch(Dataset):
         super().__init__()
         self.dataset = dataset
         assert self.dataset.stream is False, 'Streaming data not supported in JackKnifeTorch yet'
-        self.model = model()
+        self.model = model
         self.ids = list(range(self.dataset.size))
 
     def __getitem__(self, idx: int) -> np.array:

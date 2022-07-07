@@ -10,10 +10,11 @@ import pickle as pkl
 
 
 class FastGlove(Model):
-    def __init__(self, embedding_dir="embeddings"):
+    def __init__(self, embedding_dir="embeddings", dim=100, load=True):
         # dim fixed comes from trained model
         # need to fix this, written specifically for word2vec
-        super().__init__(dim=100, load=True, window_size=8, min_count=10, path=embedding_dir)
+        assert load, "load must be true"
+        super().__init__(dim=dim, load=load, window_size=8, min_count=10, path=embedding_dir)
 
     def load(self, path):
         self.g = glove.Glove()
