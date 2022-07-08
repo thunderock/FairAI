@@ -22,7 +22,6 @@ DATA_SRC = {
 embeddings_params = {
     "threads": 55,
     "dim": 100,
-    # "dataset": dataset.Dataset(DATA_SRC[WIKI]),
     "embedding_dir": DATA_SRC[EMBEDDINGS],
     "output_dir": DATA_SRC[OUTPUT],
     "window_size": 8,

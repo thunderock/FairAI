@@ -34,8 +34,7 @@ def dataset(dataset_file, dataset_type):
     else:
         assert False, 'Dataset type not supported yet!'
 
-def file_name(outfile):
-    return outfile
+def file_name(outfile): return outfile
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset_type', type=str, default=WIKI, help='Dataset to use')
@@ -46,9 +45,9 @@ parser.add_argument('--dim', type=int, default=100, help='Dimension of the model
 parser.add_argument('--outfile', type=str, default='output.npy', help='Output file')
 args = parser.parse_args()
 # print(ds.lines)
-m = model(args.model_name, args.dim)
+
 ds = dataset(args.dataset_file, args.dataset_type)
-jk = JackKnifeTorch(dataset=ds, model=m)
+jk = JackKnifeTorch(dataset=ds, model=model(args.model_name, args.dim))
 total = len(jk)
 total = ds.size
 threads = args.threads
