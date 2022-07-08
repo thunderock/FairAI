@@ -42,10 +42,11 @@ rule calculate_glove_weat_scores_100:
 
 rule train_biased_word2vec_100:
     input:
-        biased_iids = "dataset.pkl",
+        biased_iids = "dataset_100.pkl",
         dataset = DATA_SRC[WIKI]
     output:
         out = "biased_word2vec_100.bin"
+    threads: 1
     run:
         # should I write code here instead of calling driver
         import pickle as pkl
