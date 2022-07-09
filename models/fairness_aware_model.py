@@ -23,7 +23,10 @@ class FairnessAwareModel(Model):
         self.model = gravlearn.Word2Vec(vocab_size=num_nodes, dim=dim)
         self.device = device
 
-    def save(self, path, biased_wv):
+    def save(self, path, biased_wv=None):
+        if biased_wv is None:
+            # TODO(ashutiwa): load biased wv from path
+            pass
         in_vec = self.model.ivectors.weight.detach().cpu().numpy()
         kv = gensim.models.KeyedVectors(in_vec.shape[1])
         kv.add_vectors(biased_wv.index_to_key, in_vec)

@@ -64,11 +64,18 @@ rule train_biased_word2vec_100:
 rule train_fairness_aware_word2vec:
     input:
         dataset = DATA_SRC[WIKI],
-        biased_iids = "dataset.pkl",
-        biased_word2vec_100 = "biased_word2vec_100.bin"
+        biased_model = "biased_word2vec_100.bin"
+    params:
+        device = "cuda:0"
+        
     output:
         out = "fairness_aware_word2vec.bin"
     run:
-        import pickle as pkl
         from models.word2vec import Word2Vec
+        from utils.dataset import Dataset
+        biased_model = Word2Vec()
+        biased_model.load(input.biased_model)
+        docs = Dataset(input.dataset).lines
+
+
 
