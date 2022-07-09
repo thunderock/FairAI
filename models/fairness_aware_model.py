@@ -14,7 +14,7 @@ import torch
 from numba import njit
 from models.model import Model
 from utils.word2vec_sampler import Word2VecSampler
-
+from utils.config_utils import get_sk_value, CONSTANTS
 
 class FairnessAwareModel(Model):
 

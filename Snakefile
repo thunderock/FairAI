@@ -1,4 +1,5 @@
 from os.path import join as j
+from utils.config_utils import CONSTANTS
 
 DIMS = [25, 100]
 WIKI = 'wiki'
@@ -66,16 +67,28 @@ rule train_fairness_aware_word2vec:
         dataset = DATA_SRC[WIKI],
         biased_model = "biased_word2vec_100.bin"
     params:
-        device = "cuda:0"
-        
+        device = "cuda:0",
+        dist_metric = CONSTANTS.DIST_METRIC.DOTSIM,
+        checkpoint = 1000,
+        lr = .001,
     output:
         out = "fairness_aware_word2vec.bin"
     run:
         from models.word2vec import Word2Vec
         from utils.dataset import Dataset
+        import pickle as pkl
         biased_model = Word2Vec()
         biased_model.load(input.biased_model)
         docs = Dataset(input.dataset).lines
+        pkl.dump(docs, open("{}".format(output.out), "wb"))
 
-
-
+rule test_config:
+    input: dataset = DATA_SRC[WIKI],
+    output: dataset = "/tmp/scores.npy"
+    threads: 2
+    params:
+        device = "cuda:0",
+        dist_metric = CONSTANTS.DIST_METRIC.DOTSIM,
+        checkpoint = 1000,
+        lr = .001,
+    script: "test.py"
