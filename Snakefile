@@ -71,3 +71,4 @@ rule train_fairness_aware_word2vec:
     run:
         import pickle as pkl
         from models.word2vec import Word2Vec
+
