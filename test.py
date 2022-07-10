@@ -9,4 +9,5 @@ val = get_sk_value(param=CONSTANTS.DIST_METRIC.__name__.lower(), field=snakemake
 print("testing object: ", type(val), val)
 val = get_sk_value(param="lr", field=snakemake.params)
 print("testing float: ", type(val), val)
+
 np.save("/tmp/scores.npy", np.zeros(1))

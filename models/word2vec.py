@@ -19,7 +19,7 @@ class Word2Vec(Model):
         if load:
             self.load(path)
 
-    def fit(self, iid, dataset, workers=1, params=None):
+    def fit(self, iid, dataset, workers=1, ):
         model = gensim.models.Word2Vec(window=self.window_size, min_count=self.min_count,
                                              workers=workers, vector_size=self.dim)
         if iid is None:

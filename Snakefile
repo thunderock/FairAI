@@ -1,5 +1,5 @@
 from os.path import join as j
-from utils.config_utils import CONSTANTS
+from utils.config_utils import CONSTANTS, set_snakemake_config
 
 DIMS = [25, 100]
 WIKI = 'wiki'
@@ -66,21 +66,56 @@ rule train_fairness_aware_word2vec:
     input:
         dataset = DATA_SRC[WIKI],
         biased_model = "biased_word2vec_100.bin"
+    threads: 4
     params:
         device = "cuda:0",
         dist_metric = CONSTANTS.DIST_METRIC.DOTSIM,
         checkpoint = 1000,
         lr = .001,
+        dim = 100,
+        window_size = 8,
     output:
-        out = "fairness_aware_word2vec.bin"
+        kv_path = "kv_path.out",
+        outfile = "fairness_model_ck.pt"
     run:
+        set_snakemake_config(param=CONSTANTS.DIST_METRIC.__name__.lower(), value=params.dist_metric)
+        set_snakemake_config(param="checkpoint", value=params.checkpoint)
+        set_snakemake_config(param="lr", value=params.lr)
+        set_snakemake_config(param="outfile", value=output.outfile, field_name=CONSTANTS.OUTPUT)
+
+        import numpy as np
         from models.word2vec import Word2Vec
+        from models.fairness_aware_model import FairnessAwareModel
         from utils.dataset import Dataset
-        import pickle as pkl
+        import gravlearn
+        from tqdm import tqdm
+        from utils.word2vec_sampler import Word2VecSampler
+
         biased_model = Word2Vec()
         biased_model.load(input.biased_model)
-        docs = Dataset(input.dataset).lines
-        pkl.dump(docs, open("{}".format(output.out), "wb"))
+        docs = Dataset(input.dataset).lines[:100]
+        num_nodes = len(biased_model._model.wv)
+        dim = params.dim
+        in_vec = np.zeros((num_nodes, dim))
+        out_vec = np.zeros((num_nodes, dim))
+        for i, k in enumerate(biased_model._model.wv.index_to_key):
+            in_vec[i, :] = biased_model._model.wv[k]
+            out_vec[i, :] = biased_model._model.syn1neg[i]
+        pos_sampler = gravlearn.nGramSampler(window_length=params.window_size,
+            context_window_type="double", buffer_size=1000,)
+        neg_sampler = Word2VecSampler(in_vec=in_vec, out_vec=out_vec, alpha=.9, m=500)
+        word2idx = biased_model._model.wv.key_to_index.copy()
+        indexed_documents = [list(filter(lambda x: x != -1,map(lambda x: word2idx.get(x,-1),doc))) for doc in
+                             tqdm(docs)]
+        neg_sampler.fit(indexed_documents)
+        pos_sampler.fit(indexed_documents)
+        dataset = gravlearn.TripletDataset(epochs=1, pos_sampler=pos_sampler, neg_sampler=neg_sampler)
+        dataset = gravlearn.DataLoader(dataset, batch_size=1000, shuffle=False, num_workers=4, pin_memory=True)
+
+        model = FairnessAwareModel(device=params.device, num_nodes=num_nodes, dim=dim)
+        model.fit(dataset=dataset)
+        model.save(output.kv_path)
+
 
 rule test_config:
     input: dataset = DATA_SRC[WIKI],
@@ -92,3 +127,19 @@ rule test_config:
         checkpoint = 1000,
         lr = .001,
     script: "test.py"
+
+rule test_config_persistence:
+    input: dataset = DATA_SRC[WIKI],
+    output: dataset = "/tmp/scores.npy"
+    threads: 2
+    params:
+        device = "cuda:0",
+        dist_metric = CONSTANTS.DIST_METRIC.DOTSIM,
+        checkpoint = 1000,
+        lr = .001,
+    run:
+        import temp
+        from utils.config_utils import set_snakemake_config
+        print("reaches here")
+        set_snakemake_config(param="device", value=params.device, )
+        temp.Test().func()
