@@ -9,7 +9,8 @@ from tqdm import tqdm
 import torch
 from models.model import Model
 from utils.config_utils import get_sk_value, CONSTANTS
-
+# import wandb
+# wandb.login()
 
 class FairnessAwareModel(Model):
 
@@ -20,16 +21,21 @@ class FairnessAwareModel(Model):
         self.params = params["params"]
         self.output = params["output"]
         self.outfile = get_sk_value("outfile", self.output)
+        # self.run = wandb.init(settings=wandb.Settings(start_method='fork'), project="FairAI")
 
+    def __del__(self):
+        # self.run.finish()
+        pass
 
-    def save(self, path, biased_wv=None):
+    def save(self, path, biased_wv=None, kv_path=None):
+        assert not bool(biased_wv) ^ bool(kv_path), "both of biased_wv and kv_path must be specified"
+        torch.save(self.model.state_dict(), path)
         if biased_wv is None:
-            # TODO(ashutiwa): load biased wv from path
-            pass
+            return
         in_vec = self.model.ivectors.weight.detach().cpu().numpy()
         kv = gensim.models.KeyedVectors(in_vec.shape[1])
         kv.add_vectors(biased_wv.index_to_key, in_vec)
-        kv.save(path)
+        kv.save(kv_path)
 
     def fit(self, dataset: gravlearn.DataLoader, workers=4, iid=None):
         assert not iid, 'iid not yet supported in FairnessAwareModel'
@@ -51,9 +57,9 @@ class FairnessAwareModel(Model):
             p1, p2, n1 = p1.to(self.device), p2.to(self.device), n1.to(self.device)
             loss = loss_func(p1, p2, n1)
             loss.backward()
-
             torch.nn.utils.clip_grad_norm_(focal_params, 1)
             optim.step()
             pbar.set_postfix(loss=loss.item())
+            # wandb.log({"loss": loss.item()})
             if (it + 1) % checkpoint == 0 and self.outfile:
                 torch.save(self.model.state_dict(), self.outfile)

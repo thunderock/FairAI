@@ -10,12 +10,13 @@ from utils.config_utils import get_sk_value, CONSTANTS
 
 params = snakemake.params
 output = snakemake.output
+input = snakemake.input
 print(type(get_sk_value(CONSTANTS.DIST_METRIC.__name__.lower(), params, object=True)))
 print(get_sk_value("checkpoint", params))
 
 biased_model = Word2Vec()
-biased_model.load("biased_word2vec_100.bin")
-docs = Dataset("../simplewiki-20171103-pages-articles-multistream.xml.bz2").lines
+biased_model.load(get_sk_value("biased_model", input))
+docs = Dataset(get_sk_value("dataset", input)).lines
 num_nodes = len(biased_model._model.wv)
 dim = 100
 in_vec = np.zeros((num_nodes, dim))
@@ -36,4 +37,7 @@ dataset = gravlearn.DataLoader(dataset, batch_size=40000, shuffle=False, num_wor
 
 model = FairnessAwareModel(device="cuda:0", num_nodes=num_nodes, dim=dim, params={"params": params, "output": output})
 model.fit(dataset=dataset)
-model.save("kv_path.out")
+model_output = get_sk_value("outfile", output)
+kv_path = get_sk_value("kv_path", output)
+model.save(path=model_output, biased_wv=biased_model._model.wv, kv_path=kv_path)
+del model

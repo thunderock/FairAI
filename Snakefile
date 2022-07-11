@@ -114,7 +114,7 @@ rule train_fairness_aware_word2vec:
         model = FairnessAwareModel(device=params.device,num_nodes=num_nodes,dim=dim,params={
             "params": "snakemake.params", "output": "snakemake.output"})
         model.fit(dataset=dataset, )
-        model.save(output.kv_path)
+        model.save(path=output.outfile, biased_wv=biased_model._model.wv, kv_path=output.kv_path)
 
 
 rule test_config:
