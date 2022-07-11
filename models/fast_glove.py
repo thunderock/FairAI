@@ -26,7 +26,7 @@ class FastGlove(Model):
         self.weat_words = pkl.load(open("weat/words.pkl", "rb"))
 
 
-    def fit(self, iid, dataset, workers=1, ):
+    def fit(self, iid, dataset, workers=1):
         document = dataset[iid]
         deltas = self.g.compute_IF_deltas(document, self.M, self.X, self.weat_words)
         return self.g.get_new_W(self.M, deltas)

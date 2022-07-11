@@ -81,7 +81,7 @@ rule train_fairness_aware_word2vec:
         set_snakemake_config(param=CONSTANTS.DIST_METRIC.__name__.lower(), value=params.dist_metric)
         set_snakemake_config(param="checkpoint", value=params.checkpoint)
         set_snakemake_config(param="lr", value=params.lr)
-        set_snakemake_config(param="outfile", value=output.outfile, field_name=CONSTANTS.OUTPUT)
+        set_snakemake_config(param="outfile", value=output.outfile, field_name="snakemake." + CONSTANTS.OUTPUT)
 
         import numpy as np
         from models.word2vec import Word2Vec
@@ -93,9 +93,9 @@ rule train_fairness_aware_word2vec:
 
         biased_model = Word2Vec()
         biased_model.load(input.biased_model)
-        docs = Dataset(input.dataset).lines[:100]
         num_nodes = len(biased_model._model.wv)
         dim = params.dim
+        docs = Dataset(input.dataset).lines
         in_vec = np.zeros((num_nodes, dim))
         out_vec = np.zeros((num_nodes, dim))
         for i, k in enumerate(biased_model._model.wv.index_to_key):
@@ -110,10 +110,10 @@ rule train_fairness_aware_word2vec:
         neg_sampler.fit(indexed_documents)
         pos_sampler.fit(indexed_documents)
         dataset = gravlearn.TripletDataset(epochs=1, pos_sampler=pos_sampler, neg_sampler=neg_sampler)
-        dataset = gravlearn.DataLoader(dataset, batch_size=1000, shuffle=False, num_workers=4, pin_memory=True)
-
-        model = FairnessAwareModel(device=params.device, num_nodes=num_nodes, dim=dim)
-        model.fit(dataset=dataset)
+        dataset = gravlearn.DataLoader(dataset, batch_size=40000, shuffle=False, num_workers=4, pin_memory=True)
+        model = FairnessAwareModel(device=params.device,num_nodes=num_nodes,dim=dim,params={
+            "params": "snakemake.params", "output": "snakemake.output"})
+        model.fit(dataset=dataset, )
         model.save(output.kv_path)
 
 
@@ -140,6 +140,23 @@ rule test_config_persistence:
     run:
         import temp
         from utils.config_utils import set_snakemake_config
-        print("reaches here")
         set_snakemake_config(param="device", value=params.device, )
         temp.Test().func()
+
+
+rule train_fairness_aware_word2vec_script:
+    input:
+        dataset = DATA_SRC[WIKI],
+        biased_model = "biased_word2vec_100.bin"
+    threads: 4
+    params:
+        device = "cuda:0",
+        dist_metric = CONSTANTS.DIST_METRIC.DOTSIM,
+        checkpoint = 1000,
+        lr = .001,
+        dim = 100,
+        window_size = 8,
+    output:
+        kv_path = "kv_path.out",
+        outfile = "fairness_model_ck.pt"
+    script: "train_fairness_aware.py"

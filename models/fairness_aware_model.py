@@ -10,12 +10,17 @@ import torch
 from models.model import Model
 from utils.config_utils import get_sk_value, CONSTANTS
 
+
 class FairnessAwareModel(Model):
 
-    def __init__(self, device, num_nodes, dim):
-        super().__init__(device, num_nodes, dim)
+    def __init__(self, device, num_nodes, dim, params):
+        super().__init__(dim=100, load=False)
         self.model = gravlearn.Word2Vec(vocab_size=num_nodes, dim=dim)
         self.device = device
+        self.params = params["params"]
+        self.output = params["output"]
+        self.outfile = get_sk_value("outfile", self.output)
+
 
     def save(self, path, biased_wv=None):
         if biased_wv is None:
@@ -26,16 +31,16 @@ class FairnessAwareModel(Model):
         kv.add_vectors(biased_wv.index_to_key, in_vec)
         kv.save(path)
 
-    def fit(self, dataset: gravlearn.DataLoader, workers=4, iid=None, ):
+    def fit(self, dataset: gravlearn.DataLoader, workers=4, iid=None):
         assert not iid, 'iid not yet supported in FairnessAwareModel'
         self.device = next(self.model.parameters()).device
         self.model.train()
         self.model = self.model.to(self.device)
         self.device = next(self.model.parameters()).device
-        loss_func = gravlearn.TripletLoss(embedding=self.model, dist_metric=get_sk_value(CONSTANTS.DIST_METRIC.__name__.lower(), CONSTANTS.PARAMS, object=True))
-        checkpoint = get_sk_value("checkpoint", CONSTANTS.PARAMS)
+        loss_func = gravlearn.TripletLoss(embedding=self.model, dist_metric=get_sk_value(CONSTANTS.DIST_METRIC.__name__.lower(), self.params, object=True))
+        checkpoint = get_sk_value("checkpoint", self.params)
         focal_params = filter(lambda p: p.requires_grad, self.model.parameters())
-        optim = torch.optim.AdamW(focal_params, lr=get_sk_value("lr", CONSTANTS.PARAMS))
+        optim = torch.optim.AdamW(focal_params, lr=get_sk_value("lr", self.params))
         pbar = tqdm(enumerate(dataset), total=len(dataset), miniters=100)
         for it, (p1, p2, n1) in pbar:
             focal_params = filter(lambda p: p.requires_grad, self.model.parameters())
@@ -50,6 +55,5 @@ class FairnessAwareModel(Model):
             torch.nn.utils.clip_grad_norm_(focal_params, 1)
             optim.step()
             pbar.set_postfix(loss=loss.item())
-            outfile = get_sk_value("outfile", CONSTANTS.OUTPUT)
-            if (it + 1) % checkpoint == 0 and outfile:
-                torch.save(self.model.state_dict(), outfile)
+            if (it + 1) % checkpoint == 0 and self.outfile:
+                torch.save(self.model.state_dict(), self.outfile)

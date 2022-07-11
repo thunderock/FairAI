@@ -12,7 +12,7 @@ class Model(object):
         if load:
             self.load(path)
 
-    def fit(self, iid, dataset, workers=4, ):
+    def fit(self, iid, dataset, workers=4):
         assert False, 'Not implemented'
 
     def save(self, path):
