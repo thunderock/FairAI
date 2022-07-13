@@ -54,10 +54,10 @@ rule train_biased_word2vec_100:
         from utils.dataset import Dataset
         from models.word2vec import Word2Vec
         iids = pkl.load(open(input.biased_iids, 'rb'))
-        ds = Dataset(input.dataset)
+        ds = Dataset(input.dataset).lines
         model = Word2Vec(load=False, window_size=embeddings_params['window_size'],
             min_count=embeddings_params['min_count'], dim=embeddings_params['dim'])
-        dataset = [ds.lines[iid] for iid in iids]
+        dataset = [ds[iid] for iid in iids]
         # TODO (ashutiwa): remove iid as mandatory parameter from base class
         model.fit(iid=None, dataset=dataset)
         model.save(output.out)
