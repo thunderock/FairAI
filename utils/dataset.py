@@ -3,21 +3,38 @@
 # @Email:       checkashu@gmail.com
 # @Time:        6/3/22 12:38 PM
 
-from gensim.corpora.wikicorpus import WikiCorpus
-
-
 class Dataset(object):
     def __init__(self, path, stream=False):
         self.path = path
         self.stream = stream
-        self.lines = list(WikiCorpus(self.path).get_texts()) if (path and not stream) else None
+        self.__lines = None
 
-    # @property
-    # def lines(self):
-    #     if self.stream:
-    #         return WikiCorpus(self.path).getstream()
-    #     return self.__lines
+    def _load_in_array(self):
+        from gensim.corpora.wikicorpus import WikiCorpus
+        return list(WikiCorpus(self.path).get_texts())
+
+    @property
+    def lines(self):
+        if self.__lines:
+            return self.__lines
+        # TODO (ashutiwa): need to handle streams later
+        self.__lines = self._load_in_array() if (self.path and not self.stream) else None
+        return self.__lines
 
     @property
     def size(self):
-        return len(self.lines)
+        if not self.__lines:
+            self.lines
+        return len(self.__lines)
+
+
+class PandasDataset(Dataset):
+    def __init__(self, path, column, stream=False):
+        super().__init__(path, stream)
+        self.column = column
+
+    def _load_in_array(self):
+        from ast import literal_eval
+        import pandas as pd
+        return pd.read_csv(self.path, usecols=[self.column])[self.column].apply(literal_eval).tolist()
+

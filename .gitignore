@@ -132,3 +132,8 @@ embeddings
 .snakemake
 *.pkl
 *.bin
+*.npy
+*.out
+*.pt
+wandb
+*.csv

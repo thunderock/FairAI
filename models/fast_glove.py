@@ -23,8 +23,7 @@ class FastGlove(Model):
         V = len(self.M.vocab)
         cooc_path = os.path.join(path, "cooc-C0-V10-W8.bin")
         self.X = self.g.load_cooc(cooc_path, V)
-        self.weat_words = pkl.load(open("weat/words.pkl", "rb"))
-
+        self.weat_words = pkl.load(open(os.path.join(path, '..', "weat/words.pkl"), "rb"))
 
     def fit(self, iid, dataset, workers=1):
         document = dataset[iid]
