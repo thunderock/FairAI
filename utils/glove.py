@@ -37,9 +37,9 @@ class Glove(object):
                 b_u[i] = np.float64(np.frombuffer(f.read(8), dtype=np.float64))
         return W, b_w, U, b_u
 
-    def load_model(self, embedding_dir, window_size=8):
-        vocab_path = os.path.join(embedding_dir, 'vocab-C0-V10.txt')
-        embedding_path = os.path.join(embedding_dir, 'vectors-C0-V10-W8-D100-R0.05-E50-S1.bin')
+    def load_model(self, embedding_dir, window_size=8, dim=100, min_count=10):
+        vocab_path = os.path.join(embedding_dir, 'vocab-C0-V{}.txt'.format(min_count))
+        embedding_path = os.path.join(embedding_dir, 'vectors-C0-V{}-W{}-D{}-R0.05-E50-S1.bin'.format(min_count, window_size, dim))
         vocab, ivocab = self.load_vocab(vocab_path)
         d = window_size
         V = len(vocab)
