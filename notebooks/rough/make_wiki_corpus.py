@@ -46,8 +46,8 @@ with open(outname + ".txt", "w") as f:
             f.write("\n")
             line += 1
 
-        if wc >= MAX_WC:
-            break
+        # if wc >= MAX_WC:
+        #     break
 #
 # print("Selected", ac, "documents. (", wc, "words )")
 #

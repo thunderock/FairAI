@@ -1,0 +1,6 @@
+source: ../../simplewiki-20171103-pages-articles-multistream.xml.bz2
+document_min_wc: 200
+document_max_wc: 10000
+num_documents: 29344
+num_words: 17033637
+fields: ['id', 'name', 'wc', 'line', 'byte']
