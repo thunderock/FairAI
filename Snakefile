@@ -11,7 +11,7 @@ GLOVE = 'glove'
 DATASETS = [WIKI]
 DATA_SRC = {
     WIKI: '../simplewiki-20171103-pages-articles-multistream.xml.bz2',
-    PANDAS: 'notebooks/rough/jigsaw_cleaned.csv',
+    PANDAS: 'notebooks/rough/cleaned_ny.csv',
     EMBEDDINGS: 'embeddings',
     OUTPUT: 'data'
 }
@@ -31,13 +31,13 @@ EMBEDDING_FILE = j("{embedding_dir}", 'vectors-C0-V{min_count}-W{window_size}-D{
 COOC_PATH = j("{embedding_dir}",'cooc-C0-V{min_count}-W{window_size}.bin')
 SCORES_OUTPUT = j("{output_dir}", 'weat_scores_{dim}.npy')
 
-rule calculate_glove_weat_scores_100_jigsaw:
+rule calculate_glove_weat_scores_100_nyt:
     input:
         dataset = DATA_SRC[PANDAS],
         vocab_file = expand(VOCAB_FILE, **embeddings_params),
         embedding_file = expand(EMBEDDING_FILE, **embeddings_params),
         cooc_path = expand(COOC_PATH, **embeddings_params),
-    threads: 55
+    threads: 70
     params:
         dim = 100,
         model_name = GLOVE,
