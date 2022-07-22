@@ -2,6 +2,8 @@
 # @Author:      Ashutosh Tiwari
 # @Email:       checkashu@gmail.com
 # @Time:        6/3/22 11:04 PM
+import numpy as np
+
 
 class Model(object):
     def __init__(self, dim=100, load=False, window_size=10, min_count=5, path=None):
@@ -21,5 +23,21 @@ class Model(object):
     def load(self, path):
         assert False, 'Not implemented'
 
-    def transform(self, words, WV):
-        assert False, 'Not implemented'
+    def transform(self, words, WV=None):
+        """
+        to call this WV should be None, attempts to be called from custom models for less work, uses _model attribute
+        :param words:
+        :param WV:
+        :return:
+        """
+        indices = []
+        not_found = 0
+        for w in words:
+            try:
+                indices.append(self._model[w])
+            except KeyError:
+                not_found += 1
+
+        if not_found > 0:
+            print("{} words not found in model".format(not_found))
+        return np.array(indices)
