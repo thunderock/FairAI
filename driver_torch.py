@@ -29,7 +29,7 @@ def dataset(dataset_file, dataset_type):
     if dataset_type == WIKI:
         return Dataset(dataset_file)
     elif dataset_type == PANDAS:
-        return PandasDataset(dataset_file, column='cleaned_comments')
+        return PandasDataset(dataset_file, column='cleaned')
     else:
         assert False, 'Dataset type not supported yet!'
 
@@ -55,8 +55,7 @@ args = Args()
 
 ds = dataset(args.dataset_file, args.dataset_type)
 jk = JackKnifeTorch(dataset=ds, model=model(args.model_name, args.dim))
-# total = len(jk)
-total = 3
+total = len(jk)
 threads = args.threads
 loops = total // threads + 1
 loader = DataLoader(jk, batch_size=threads, shuffle=False)
