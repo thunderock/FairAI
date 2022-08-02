@@ -21,7 +21,7 @@ class Model(object):
         assert False, 'Not implemented'
 
     def load(self, path):
-        assert False, 'Not implemented'
+        assert False, 'Not implemented, should take path and load model'
 
     def transform(self, words, WV=None):
         """
@@ -33,9 +33,9 @@ class Model(object):
         indices = []
         not_found = 0
         for w in words:
-            try:
+            if w in self._model:
                 indices.append(self._model[w])
-            except KeyError:
+            else:
                 not_found += 1
 
         if not_found > 0:
